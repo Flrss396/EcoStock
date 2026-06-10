@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
 // 🔐 CLAVE SECRETA — cambia esto por una llave larga y aleatoria en producción
-const SECRET = process.env.JWT_SECRET || "ecostock_secret_2025_cambia_esto";
+const SECRET = process.env.JWT_SECRET || "cefr paus pefr lffd iaam";
 
 // 🌐 Página principal
 app.get("/", (req, res) => {
@@ -33,7 +33,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.EMAIL_USER || "ecostocksupport@gmail.com",
-    pass: process.env.EMAIL_PASS || "TU_CONTRASEÑA_DE_APP_AQUI"
+    pass: process.env.EMAIL_PASS || "cddc nspm yykl lvwk"
   }
 });
 
@@ -373,7 +373,7 @@ app.get("/stats", verifyToken, (req, res) => {
 });
 
 /* ===== SERVIDOR ===== */
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`🌿 EcoStock corriendo en http://localhost:${PORT}`);
 });
