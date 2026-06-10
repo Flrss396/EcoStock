@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoStock | Gestión Premium</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- LOGIN SECTION -->
+    <section id="loginSection">
+        <div class="login-card">
+            <div class="logo" style="justify-content: center; padding: 0; margin-bottom: 20px;">
+                <span style="font-size:28px;">🌿</span>
+                <span>EcoStock</span>
+            </div>
+            
+            <!-- LOGIN FORM -->
+            <div id="loginForm">
+                <h2>Bienvenido</h2>
+                <p>Ingresa tus credenciales para continuar</p>
+                
+                <div class="form-group">
+                    <input type="email" id="email" placeholder="Correo electrónico" onkeydown="if(event.key==='Enter')login()">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" placeholder="Contraseña" onkeydown="if(event.key==='Enter')login()">
+                </div>
+                
+                <button class="primary" style="width: 100%;" onclick="login()">Iniciar Sesión</button>
+                <p id="loginError" style="color: var(--danger); margin-top: 15px; font-size: 14px; min-height: 20px;"></p>
+                
+                <p style="margin-top: 10px; font-size: 14px;">
+                    <a href="#" onclick="showForgotPassword()" style="color: var(--accent); text-decoration: none; font-weight: 600;">¿Olvidaste tu contraseña?</a>
+                </p>
+                <p style="margin-top: 12px; font-size: 14px;">
+                    ¿No tienes cuenta? <a href="#" onclick="toggleAuthMode('register')" style="color: var(--accent); text-decoration: none; font-weight: 600;">Regístrate</a>
+                </p>
+            </div>
+
+            <!-- FORGOT PASSWORD FORM -->
+            <div id="forgotForm" style="display: none;">
+                <h2>Recuperar Contraseña</h2>
+                <p>Te enviaremos un enlace a tu correo.</p>
+                
+                <div class="form-group" style="margin-top: 24px;">
+                    <input type="email" id="forgotEmail" placeholder="Correo electrónico" onkeydown="if(event.key==='Enter')sendForgotPassword()">
+                </div>
+                
+                <button class="primary" style="width: 100%;" id="forgotBtn" onclick="sendForgotPassword()">Enviar enlace</button>
+                <p id="forgotMsg" style="font-size: 14px; margin-top: 14px; min-height: 20px;"></p>
+                
+                <p style="margin-top: 14px; font-size: 14px;">
+                    <a href="#" onclick="toggleAuthMode('login')" style="color: var(--accent); text-decoration: none; font-weight: 600;">← Volver al inicio de sesión</a>
+                </p>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="registerForm" style="display: none;">
+                <h2>Crear Cuenta</h2>
+                <p>Únete a la gestión inteligente de inventarios</p>
+                
+                <div class="form-group">
+                    <input type="email" id="regEmail" placeholder="Correo electrónico">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="regPassword" placeholder="Contraseña (mínimo 6 caracteres)">
+                </div>
+
+                <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; text-align: left; background: rgba(0,113,227,0.05); padding: 14px; border-radius: 12px; border: 1px solid rgba(0,113,227,0.15);">
+                    <input type="checkbox" id="termsCheck" style="width: auto; margin-top: 3px; accent-color: var(--accent); flex-shrink: 0;" onchange="toggleRegisterBtn()">
+                    <label for="termsCheck" style="font-size: 13px; color: var(--text-secondary); margin-bottom: 0; font-weight: 400; cursor: pointer; line-height: 1.5;">
+                        He leído y acepto la 
+                        <a href="#" onclick="openTermsModal(event)" style="color: var(--accent); font-weight: 600; text-decoration: underline;">Política de Privacidad y Términos de Uso</a>
+                    </label>
+                </div>
+                
+                <button id="registerBtn" class="primary" style="width: 100%; opacity: 0.45; cursor: not-allowed;" onclick="register()" disabled>Registrarse</button>
+                
+                <p style="margin-top: 20px; font-size: 14px;">
+                    ¿Ya tienes cuenta? <a href="#" onclick="toggleAuthMode('login')" style="color: var(--accent); text-decoration: none; font-weight: 600;">Inicia Sesión</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- APP CONTAINER -->
+    <div id="appContainer" class="app-container" style="display: none;">
+        
+        <!-- HAMBURGER (mobile) -->
+        <button id="hamburgerBtn" onclick="toggleSidebar()" style="display:none; position:fixed; top:16px; left:16px; z-index:200; background:white; border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:20px; cursor:pointer; box-shadow: var(--shadow-sm);">☰</button>
+
+        <!-- SIDEBAR OVERLAY (mobile) -->
+        <div id="sidebarOverlay" onclick="toggleSidebar()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:99; backdrop-filter:blur(2px);"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <span style="font-size:22px;">🌿</span>
+                <span>EcoStock</span>
+            </div>
+            
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a class="nav-link active" data-section="home">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="inventory">
+                        <i data-lucide="package"></i>
+                        <span>Inventario</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="analytics">
+                        <i data-lucide="bar-chart-3"></i>
+                        <span>Análisis</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="settings">
+                        <i data-lucide="settings"></i>
+                        <span>Configuración</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-section="privacy">
+                        <i data-lucide="shield"></i>
+                        <span>Privacidad</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-profile">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#1a7a3a,#34c759); display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        🌿
+                    </div>
+                    <div style="overflow: hidden;">
+                        <p id="userEmail" style="font-size: 12px; font-weight: 600; white-space: nowrap; overflow:hidden; text-overflow: ellipsis; max-width:150px;"></p>
+                    </div>
+                </div>
+                <a class="nav-link" onclick="logout()" style="color: var(--danger); cursor:pointer;">
+                    <i data-lucide="log-out"></i>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header>
+                <h1 id="pageTitle">Dashboard</h1>
+                <div class="header-actions">
+                    <button id="addBtn" class="primary" onclick="navigate('inventory')" style="display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="plus" size="18"></i>
+                        <span>Nuevo Producto</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- HOME -->
+            <section id="home" class="app-section">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background:rgba(52,199,89,0.12); color:#34c759;">📦</div>
+                        <div id="totalStock" class="stat-num">0</div>
+                        <p class="stat-label">Total productos</p>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background:rgba(255,59,48,0.10); color:#ff3b30;">⚠️</div>
+                        <div id="expiredCount" class="stat-num">0</div>
+                        <p class="stat-label">Vencidos</p>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background:rgba(255,149,0,0.10); color:#ff9500;">⏳</div>
+                        <div id="warningCount" class="stat-num">0</div>
+                        <p class="stat-label">Próximos a vencer</p>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background:rgba(0,113,227,0.10); color:#0071e3;">✅</div>
+                        <div id="efficiencyRate" class="stat-num">0%</div>
+                        <p class="stat-label" id="efficiencyStatus">Eficiencia</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <p id="stockAlert" style="color: var(--text-secondary);">Cargando datos...</p>
+                </div>
+
+                <div class="card" style="margin-top: 0;">
+                    <h2>Bienvenido de nuevo 👋</h2>
+                    <p style="color: var(--text-secondary); margin-top: 10px; max-width: 600px; line-height: 1.7;">
+                        Gestiona tu inventario con la elegancia y simplicidad que tu negocio merece. EcoStock te ayuda a prevenir el desperdicio y optimizar tus recursos.
+                    </p>
+                </div>
+            </section>
+
+            <!-- INVENTORY -->
+            <section id="inventory" class="app-section" style="display: none;">
+                <div class="card">
+                    <h2 style="margin-bottom: 20px;">Registrar Producto</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 160px auto; gap: 16px; align-items: flex-end;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Nombre del Producto</label>
+                            <input type="text" id="prodName" placeholder="Ej. Manzanas Orgánicas" onkeydown="if(event.key==='Enter')addProduct()">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Fecha de Vencimiento</label>
+                            <input type="date" id="prodDate">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Categoría</label>
+                            <select id="prodCategory">
+                                <option value="General">General</option>
+                                <option value="Frutas y Verduras">🍎 Frutas y Verduras</option>
+                                <option value="Lácteos">🥛 Lácteos</option>
+                                <option value="Carnes">🥩 Carnes</option>
+                                <option value="Bebidas">🥤 Bebidas</option>
+                                <option value="Panadería">🍞 Panadería</option>
+                                <option value="Congelados">🧊 Congelados</option>
+                                <option value="Medicamentos">💊 Medicamentos</option>
+                                <option value="Limpieza">🧴 Limpieza</option>
+                            </select>
+                        </div>
+                        <button class="primary" onclick="addProduct()" style="white-space:nowrap;">+ Agregar</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap:wrap; gap:12px;">
+                        <h2>Lista de Inventario</h2>
+                        <div style="display: flex; gap: 10px; flex-wrap:wrap;">
+                            <input type="text" id="searchInput" placeholder="🔍 Buscar..." style="width: 180px; padding: 10px 14px; font-size:14px;" oninput="filterInventory()">
+                            <select id="filterStatus" onchange="filterInventory()" style="padding: 10px 14px; font-size:14px;">
+                                <option value="">Todos los estados</option>
+                                <option value="Seguro">Seguro</option>
+                                <option value="Próximo a vencer">Próximo a vencer</option>
+                                <option value="Vencido">Vencido</option>
+                            </select>
+                            <button onclick="exportCSV()" style="padding:10px 16px; background:rgba(0,0,0,0.06); color:var(--text-primary); font-size:13px; display:flex; align-items:center; gap:6px;">
+                                📥 Exportar CSV
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Vencimiento</th>
+                                    <th>Días</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryBody">
+                                <tr><td colspan="6" style="text-align:center; color:var(--text-secondary); padding:30px;">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p id="inventoryCount" style="margin-top:14px; font-size:13px; color:var(--text-secondary);"></p>
+                </div>
+            </section>
+
+            <!-- ANALYTICS -->
+            <section id="analytics" class="app-section" style="display: none;">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; flex-wrap:wrap;">
+                    <div class="card">
+                        <h2>Estado del Inventario</h2>
+                        <p style="color: var(--text-secondary); margin-top: 6px; margin-bottom: 24px;">Distribución de productos por estado.</p>
+                        <div style="height: 320px; width: 100%;">
+                            <canvas id="inventoryChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h2>Por Categoría</h2>
+                        <p style="color: var(--text-secondary); margin-top: 6px; margin-bottom: 24px;">Distribución por tipo.</p>
+                        <div style="height: 320px; width: 100%;">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Productos venciendo pronto -->
+                <div class="card" style="margin-top: 0;">
+                    <h2>⏰ Vencen en los próximos 7 días</h2>
+                    <div id="upcomingList" style="margin-top: 16px;"></div>
+                </div>
+            </section>
+
+            <!-- SETTINGS -->
+            <section id="settings" class="app-section" style="display: none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                            <i data-lucide="shield-check" style="color: var(--accent);"></i>
+                            <h2 style="margin-bottom: 0;">Seguridad de la Cuenta</h2>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">Actualiza tu contraseña para mantener tu cuenta segura.</p>
+                        
+                        <div class="form-group">
+                            <label>Contraseña Actual</label>
+                            <input type="password" id="currentPass" placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label>Nueva Contraseña</label>
+                            <input type="password" id="newPass" placeholder="Mínimo 6 caracteres">
+                        </div>
+                        <button class="primary" style="width: 100%;" onclick="changePassword()">Actualizar Contraseña</button>
+                    </div>
+
+                    <div class="card">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                            <i data-lucide="sliders" style="color: var(--accent);"></i>
+                            <h2 style="margin-bottom: 0;">Preferencias</h2>
+                        </div>
+                        
+                        <div style="margin-bottom: 25px;">
+                            <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                                <span>Modo Oscuro</span>
+                                <input type="checkbox" style="width: auto;" id="darkModeToggle">
+                            </label>
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Cambia el tema visual de la aplicación.</p>
+                        </div>
+
+                        <div style="margin-bottom: 0;">
+                            <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                                <span>Alertas de Vencimiento</span>
+                                <input type="checkbox" checked style="width: auto;" id="alertsToggle">
+                            </label>
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">Muestra alertas al iniciar sesión.</p>
+                        </div>
+                    </div>
+
+                    <div class="card" style="grid-column: span 2;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                            <i data-lucide="help-circle" style="color: var(--accent);"></i>
+                            <h2 style="margin-bottom: 0;">Ayuda y Soporte</h2>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                            <div style="padding: 16px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.02)'" onmouseout="this.style.background='transparent'" onclick="navigate('inventory')">
+                                <h4 style="margin-bottom: 5px;">📦 Ir al Inventario</h4>
+                                <p style="font-size: 12px; color: var(--text-secondary);">Gestiona tus productos.</p>
+                            </div>
+                            <div style="padding: 16px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.02)'" onmouseout="this.style.background='transparent'" onclick="window.open('mailto:ecostocksupport@gmail.com','_blank')">
+                                <h4 style="margin-bottom: 5px;">📧 Contactar Soporte</h4>
+                                <p style="font-size: 12px; color: var(--text-secondary);">ecostocksupport@gmail.com</p>
+                            </div>
+                            <div style="padding: 16px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.02)'" onmouseout="this.style.background='transparent'" onclick="navigate('privacy')">
+                                <h4 style="margin-bottom: 5px;">🔒 Términos y Privacidad</h4>
+                                <p style="font-size: 12px; color: var(--text-secondary);">Legal y seguridad.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PRIVACY -->
+            <section id="privacy" class="app-section" style="display: none;">
+                <div class="card" style="max-width: 860px;">
+                    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 8px;">
+                        <i data-lucide="shield-check" style="color: var(--accent);"></i>
+                        <h2 style="font-size: 26px;">Política de Privacidad y Términos de Uso</h2>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 32px;">Última actualización: junio 2025 · Versión 2.0</p>
+
+                    <div style="display: flex; flex-direction: column; gap: 22px;">
+                        <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,113,227,0.04);">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <i data-lucide="database" style="color: var(--accent); flex-shrink:0;"></i>
+                                <h3 style="font-size: 16px;">1. Datos que recopilamos</h3>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 14px; line-height: 1.9; padding-left: 20px; margin: 0;">
+                                <li><strong style="color: var(--text-primary);">Correo electrónico</strong> — para identificar tu cuenta.</li>
+                                <li><strong style="color: var(--text-primary);">Contraseña</strong> — almacenada como hash cifrado (bcrypt). Nunca en texto plano.</li>
+                                <li><strong style="color: var(--text-primary);">Inventario</strong> — nombre, categoría y fecha de vencimiento de productos.</li>
+                                <li><strong style="color: var(--text-primary);">Preferencia de tema</strong> — modo claro/oscuro, guardado en tu navegador.</li>
+                            </ul>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 12px; padding: 10px; background: rgba(52,199,89,0.08); border-radius: 8px;">✅ No recopilamos nombre, teléfono, dirección ni datos de pago.</p>
+                        </div>
+
+                        <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,113,227,0.04);">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <i data-lucide="lock" style="color: var(--accent); flex-shrink:0;"></i>
+                                <h3 style="font-size: 16px;">2. Cómo protegemos tu información</h3>
+                            </div>
+                            <ul style="color: var(--text-secondary); font-size: 14px; line-height: 1.9; padding-left: 20px; margin: 0;">
+                                <li>Contraseñas cifradas con <strong style="color: var(--text-primary);">bcrypt</strong> (10 rondas).</li>
+                                <li>Rutas protegidas con <strong style="color: var(--text-primary);">JWT</strong>, expira en 8 horas.</li>
+                                <li>Cabeceras HTTP seguras vía <strong style="color: var(--text-primary);">Helmet.js</strong>.</li>
+                                <li>Tokens de recuperación expiran en 10 minutos y son de un solo uso.</li>
+                                <li>Inventario aislado por usuario — nadie más puede ver el tuyo.</li>
+                            </ul>
+                        </div>
+
+                        <div style="padding: 20px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,113,227,0.04);">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <i data-lucide="mail" style="color: var(--accent); flex-shrink:0;"></i>
+                                <h3 style="font-size: 16px;">3. Contacto</h3>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.7;">
+                                Para dudas sobre privacidad o solicitud de datos:<br>
+                                <a href="mailto:ecostocksupport@gmail.com" style="color: var(--accent); font-weight: 600; text-decoration: none;">ecostocksupport@gmail.com</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- TERMS MODAL -->
+    <div id="termsModal" style="display:none; position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.5); backdrop-filter:blur(6px); justify-content:center; align-items:center; padding:20px;">
+        <div style="background:var(--card-bg,white); border-radius:20px; max-width:580px; width:100%; max-height:82vh; display:flex; flex-direction:column; box-shadow:0 30px 60px rgba(0,0,0,0.25); border:1px solid var(--border);">
+            <div style="padding:24px 28px 16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="font-size:18px;">🔒 Política de Privacidad</h2>
+                <button onclick="closeTermsModal()" style="padding:6px; background:rgba(0,0,0,0.06); border-radius:8px; color:var(--text-secondary);">✕</button>
+            </div>
+            <div style="overflow-y:auto; padding:24px 28px; flex:1; font-size:14px; color:var(--text-secondary); line-height:1.8;">
+                <p>EcoStock almacena tu correo, contraseña cifrada e inventario de productos. No compartimos datos con terceros. Los tokens de recuperación de contraseña expiran en 10 minutos. Tus datos de inventario son privados y solo tú los ves.</p>
+                <p style="margin-top:12px;">Contacto: <a href="mailto:ecostocksupport@gmail.com" style="color:var(--accent);">ecostocksupport@gmail.com</a></p>
+            </div>
+            <div style="padding:16px 28px; border-top:1px solid var(--border); display:flex; gap:10px;">
+                <button onclick="acceptTermsFromModal()" class="primary" style="flex:1;">Acepto</button>
+                <button onclick="closeTermsModal()" style="flex:1; background:rgba(0,0,0,0.06); color:var(--text-primary);">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="app.js"></script>
+    <script>
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        function openTermsModal(e) {
+            if (e) e.preventDefault();
+            document.getElementById('termsModal').style.display = 'flex';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+        function closeTermsModal() {
+            document.getElementById('termsModal').style.display = 'none';
+        }
+        function acceptTermsFromModal() {
+            const cb = document.getElementById('termsCheck');
+            if (cb) { cb.checked = true; toggleRegisterBtn(); }
+            closeTermsModal();
+        }
+        function toggleRegisterBtn() {
+            const cb = document.getElementById('termsCheck');
+            const btn = document.getElementById('registerBtn');
+            if (!cb || !btn) return;
+            btn.disabled = !cb.checked;
+            btn.style.opacity = cb.checked ? '1' : '0.45';
+            btn.style.cursor = cb.checked ? 'pointer' : 'not-allowed';
+        }
+        document.getElementById('termsModal').addEventListener('click', function(e) {
+            if (e.target === this) closeTermsModal();
+        });
+    </script>
+</body>
+</html>

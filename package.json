@@ -1,0 +1,22 @@
+{
+  "name": "ecostock",
+  "version": "2.0.0",
+  "description": "EcoStock - Gestión inteligente de inventario",
+  "main": "server.js",
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^8.0.3",
+    "sqlite3": "^5.1.7"
+  }
+}

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nueva Contraseña | EcoStock</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #34c759;
+      --accent-dark: #1a7a3a;
+      --danger: #ff3b30;
+      --text-primary: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --border: rgba(0,0,0,0.1);
+      --bg: #f5f5f7;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 50px 44px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #1a7a3a, #34c759);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .logo span {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .icon-wrap {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, #e8f8ee, #c6f0d4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 22px;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .input-wrap {
+      position: relative;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 14px 46px 14px 16px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: #fafafa;
+    }
+    input[type="password"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(52,199,89,0.12);
+      background: white;
+    }
+    .eye-btn {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-secondary);
+      padding: 4px;
+    }
+    .strength-bar {
+      height: 4px;
+      border-radius: 4px;
+      background: #e5e5ea;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s, background 0.3s;
+    }
+    .strength-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      text-align: right;
+    }
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 6px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+      color: white;
+      box-shadow: 0 4px 15px rgba(52,199,89,0.30);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(52,199,89,0.40);
+    }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .msg {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      display: none;
+    }
+    .msg.success {
+      background: rgba(52,199,89,0.10);
+      color: #1a7a3a;
+      border: 1px solid rgba(52,199,89,0.25);
+    }
+    .msg.error {
+      background: rgba(255,59,48,0.08);
+      color: #c0392b;
+      border: 1px solid rgba(255,59,48,0.2);
+    }
+    .back-link {
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .back-link a {
+      color: var(--accent-dark);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .back-link a:hover { text-decoration: underline; }
+    /* Estado de token inválido */
+    #invalidState { display: none; }
+    #formState { display: none; }
+    #successState { display: none; }
+    #loadingState {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(52,199,89,0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <div class="logo-icon">🌿</div>
+      <span>EcoStock</span>
+    </div>
+
+    <!-- CARGANDO -->
+    <div id="loadingState">
+      <div class="spinner"></div>
+      <p>Verificando enlace...</p>
+    </div>
+
+    <!-- TOKEN INVÁLIDO -->
+    <div id="invalidState">
+      <div class="icon-wrap">❌</div>
+      <h1>Enlace inválido</h1>
+      <p class="subtitle">Este enlace de recuperación ha expirado o ya fue usado. Los enlaces son válidos por 10 minutos.</p>
+      <a href="/" class="btn btn-primary" style="display:block;text-decoration:none;line-height:1.5;">
+        Volver al inicio
+      </a>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div id="formState">
+      <div class="icon-wrap">🔑</div>
+      <h1>Nueva Contraseña</h1>
+      <p class="subtitle">Crea una contraseña segura para tu cuenta.</p>
+
+      <div class="form-group">
+        <label>Nueva contraseña</label>
+        <div class="input-wrap">
+          <input type="password" id="newPass" placeholder="Mínimo 6 caracteres" oninput="checkStrength(this.value)">
+          <button class="eye-btn" onclick="toggleEye('newPass', this)" type="button">👁</button>
+        </div>
+        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+        <p class="strength-label" id="strengthLabel">—</p>
+      </div>
+
+      <div class="form-group">
+        <label>Confirmar contraseña</label>
+        <div class="input-wrap">
+          <input type="password" id="confirmPass" placeholder="Repite la contraseña">
+          <button class="eye-btn" onclick="toggleEye('confirmPass', this)" type="button">👁</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="submitBtn" onclick="resetPassword()">
+        Guardar nueva contraseña
+      </button>
+
+      <div id="msg" class="msg"></div>
+    </div>
+
+    <!-- ÉXITO -->
+    <div id="successState">
+      <div class="icon-wrap">✅</div>
+      <h1>¡Listo!</h1>
+      <p class="subtitle">Tu contraseña fue actualizada correctamente. Ya puedes iniciar sesión.</p>
+      <a href="/" class="btn btn-primary" style="display:block;text-decoration:none;line-height:1.5;">
+        Ir a iniciar sesión
+      </a>
+    </div>
+
+    <p class="back-link">¿Necesitas ayuda? <a href="mailto:ecostocksupport@gmail.com">ecostocksupport@gmail.com</a></p>
+  </div>
+
+  <script>
+    const API = "";
+    let resetToken = null;
+
+    // Obtener token de la URL
+    const params = new URLSearchParams(window.location.search);
+    resetToken = params.get("token");
+
+    // Verificar token al cargar
+    window.addEventListener("DOMContentLoaded", async () => {
+      if (!resetToken) {
+        showState("invalidState");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API}/verify-reset-token?token=${resetToken}`);
+        const data = await res.json();
+
+        if (data.valid) {
+          showState("formState");
+        } else {
+          showState("invalidState");
+        }
+      } catch (e) {
+        showState("invalidState");
+      }
+    });
+
+    function showState(id) {
+      ["loadingState", "invalidState", "formState", "successState"].forEach(s => {
+        document.getElementById(s).style.display = s === id ? (s === "loadingState" ? "flex" : "block") : "none";
+      });
+    }
+
+    function toggleEye(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      const isPass = inp.type === "password";
+      inp.type = isPass ? "text" : "password";
+      btn.textContent = isPass ? "🙈" : "👁";
+    }
+
+    function checkStrength(val) {
+      const fill = document.getElementById("strengthFill");
+      const label = document.getElementById("strengthLabel");
+      let score = 0;
+      if (val.length >= 6) score++;
+      if (val.length >= 10) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^a-zA-Z0-9]/.test(val)) score++;
+
+      const levels = [
+        { w: "0%", color: "#e5e5ea", text: "—" },
+        { w: "25%", color: "#ff3b30", text: "Muy débil" },
+        { w: "50%", color: "#ff9500", text: "Débil" },
+        { w: "75%", color: "#ffd60a", text: "Buena" },
+        { w: "90%", color: "#30d158", text: "Fuerte" },
+        { w: "100%", color: "#34c759", text: "Muy fuerte 🔒" }
+      ];
+
+      const l = levels[Math.min(score, 5)];
+      fill.style.width = l.w;
+      fill.style.background = l.color;
+      label.textContent = l.text;
+      label.style.color = l.color;
+    }
+
+    async function resetPassword() {
+      const password = document.getElementById("newPass").value;
+      const confirm = document.getElementById("confirmPass").value;
+      const btn = document.getElementById("submitBtn");
+      const msgEl = document.getElementById("msg");
+
+      msgEl.style.display = "none";
+
+      if (!password || password.length < 6) {
+        showMsg("La contraseña debe tener al menos 6 caracteres.", "error");
+        return;
+      }
+      if (password !== confirm) {
+        showMsg("Las contraseñas no coinciden.", "error");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Guardando...";
+
+      try {
+        const res = await fetch(`${API}/reset-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: resetToken, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          showState("successState");
+        } else {
+          showMsg(data.msg || "Error al restablecer.", "error");
+          btn.disabled = false;
+          btn.textContent = "Guardar nueva contraseña";
+        }
+      } catch (e) {
+        showMsg("Error de conexión.", "error");
+        btn.disabled = false;
+        btn.textContent = "Guardar nueva contraseña";
+      }
+    }
+
+    function showMsg(text, type) {
+      const el = document.getElementById("msg");
+      el.textContent = (type === "error" ? "⚠️ " : "✅ ") + text;
+      el.className = "msg " + type;
+      el.style.display = "block";
+    }
+
+    // Enter para enviar
+    document.addEventListener("keydown", e => {
+      if (e.key === "Enter") resetPassword();
+    });
+  </script>
+</body>
+</html>
