@@ -42,11 +42,11 @@ function createTransporter() {
 
   return nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
+    port: 587,
+    secure: false,         // TLS — Railway bloquea 465 (SSL)
     auth: { user: emailUser, pass: emailPass },
     tls: { rejectUnauthorized: false },
-    connectionTimeout: 10000,   // 10 seg máximo para conectar
+    connectionTimeout: 10000,
     greetingTimeout: 10000,
     socketTimeout: 15000
   });
@@ -174,39 +174,29 @@ app.post("/forgot-password", (req, res) => {
     db.run("INSERT INTO password_resets(email,token,expires) VALUES(?,?,?)", [email, token, expires], (err2) => {
       if (err2) return res.status(500).json({ msg: "Error interno. Intenta de nuevo." });
 
-      // Verificar que EMAIL_PASS esté configurado antes de intentar enviar
-      if (!process.env.EMAIL_PASS) {
-        console.error("❌ EMAIL_PASS no está configurado en las variables de entorno.");
-        return res.status(500).json({ msg: "El servidor no tiene el correo configurado. Contacta al administrador." });
-      }
-
       const baseURL = process.env.BASE_URL || `http://localhost:${PORT}`;
       const link = `${baseURL}/reset.html?token=${token}`;
 
       const transporter = createTransporter();
+      const mailOptions = {
+        from: `"EcoStock" <${process.env.EMAIL_USER || "ecostocksupport@gmail.com"}>`,
+        to: email,
+        subject: "🔑 Recupera tu contraseña de EcoStock",
+        html: getResetEmailHTML(link, email)
+      };
 
-      // Verificar conexión SMTP antes de enviar (falla rápido si hay problema)
-      transporter.verify((verifyErr) => {
-        if (verifyErr) {
-          console.error("❌ Error verificando SMTP:", verifyErr.message);
-          return res.status(500).json({ msg: "Error de configuración de correo. Verifica EMAIL_PASS en Railway." });
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("❌ Error enviando correo:", error.message);
+          // Dar detalle en desarrollo, mensaje genérico en producción
+          const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+          const msg = isDev
+            ? `Error de correo: ${error.message}`
+            : "Error enviando correo. Verifica que EMAIL_PASS esté configurado en Railway.";
+          return res.status(500).json({ msg });
         }
-
-        const mailOptions = {
-          from: `"EcoStock" <${process.env.EMAIL_USER || "ecostocksupport@gmail.com"}>`,
-          to: email,
-          subject: "🔑 Recupera tu contraseña de EcoStock",
-          html: getResetEmailHTML(link, email)
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-            console.error("❌ Error enviando correo:", error.message);
-            return res.status(500).json({ msg: "Error enviando correo. Verifica que EMAIL_PASS esté configurado en Railway." });
-          }
-          console.log("✅ Correo enviado:", info.messageId);
-          res.json({ msg: "Correo enviado. Revisa tu bandeja (y spam por si acaso)." });
-        });
+        console.log("✅ Correo enviado:", info.messageId);
+        res.json({ msg: "Correo enviado. Revisa tu bandeja (y spam por si acaso)." });
       });
     });
   });
