@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const helmet = require("helmet");
 const db = require("./db");
 const path = require("path");
-const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 
 const app = express();
@@ -32,25 +31,32 @@ function rateLimit(key, maxRequests = 5, windowMs = 15 * 60 * 1000) {
 
 // ===== NODEMAILER — TRANSPORTER DINÁMICO =====
 // Funciona en local y en Railway/producción sin cambios
-function createTransporter() {
-  const emailUser = process.env.EMAIL_USER || "ecostocksupport@gmail.com";
-  const emailPass = process.env.EMAIL_PASS;
-
-  if (!emailPass) {
-    console.warn("⚠️  EMAIL_PASS no configurado. El envío de correo fallará.");
+// ===== ENVÍO DE CORREO VÍA RESEND (HTTP — funciona en Railway) =====
+async function sendResetEmail(toEmail, resetLink) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error("RESEND_API_KEY no configurado en Railway.");
   }
 
-  return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    family: 4,             // Forzar IPv4 — Railway no soporta IPv6
-    port: 587,
-    secure: false,         // TLS — Railway bloquea 465 (SSL)
-    auth: { user: emailUser, pass: emailPass },
-    tls: { rejectUnauthorized: false },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      from: "EcoStock <onboarding@resend.dev>",
+      to: toEmail,
+      subject: "🔑 Recupera tu contraseña de EcoStock",
+      html: getResetEmailHTML(resetLink, toEmail)
+    })
   });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || "Error en Resend API");
+  }
+  return await res.json();
 }
 
 // ===== TEMPLATE DEL CORREO =====
@@ -178,27 +184,15 @@ app.post("/forgot-password", (req, res) => {
       const baseURL = process.env.BASE_URL || `http://localhost:${PORT}`;
       const link = `${baseURL}/reset.html?token=${token}`;
 
-      const transporter = createTransporter();
-      const mailOptions = {
-        from: `"EcoStock" <${process.env.EMAIL_USER || "ecostocksupport@gmail.com"}>`,
-        to: email,
-        subject: "🔑 Recupera tu contraseña de EcoStock",
-        html: getResetEmailHTML(link, email)
-      };
-
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
+      sendResetEmail(email, link)
+        .then((info) => {
+          console.log("✅ Correo enviado via Resend:", info.id);
+          res.json({ msg: "Correo enviado. Revisa tu bandeja (y spam por si acaso)." });
+        })
+        .catch((error) => {
           console.error("❌ Error enviando correo:", error.message);
-          // Dar detalle en desarrollo, mensaje genérico en producción
-          const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
-          const msg = isDev
-            ? `Error de correo: ${error.message}`
-            : "Error enviando correo. Verifica que EMAIL_PASS esté configurado en Railway.";
-          return res.status(500).json({ msg });
-        }
-        console.log("✅ Correo enviado:", info.messageId);
-        res.json({ msg: "Correo enviado. Revisa tu bandeja (y spam por si acaso)." });
-      });
+          res.status(500).json({ msg: "Error enviando correo: " + error.message });
+        });
     });
   });
 });
