@@ -42,6 +42,7 @@ function createTransporter() {
 
   return nodemailer.createTransport({
     host: "smtp.gmail.com",
+    family: 4,             // Forzar IPv4 — Railway no soporta IPv6
     port: 587,
     secure: false,         // TLS — Railway bloquea 465 (SSL)
     auth: { user: emailUser, pass: emailPass },
