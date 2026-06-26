@@ -757,7 +757,7 @@ function renderUpcoming() {
     }).join('');
 }
 
-/* ===== CLIMA — API de terceros: OpenWeather ===== */
+/* ===== CLIMA — API de terceros: OpenWeather (vía proxy seguro) ===== */
 async function fetchWeather() {
     const city = document.getElementById("weatherCity").value.trim();
     const resultEl = document.getElementById("weatherResult");
@@ -767,16 +767,16 @@ async function fetchWeather() {
     }
     resultEl.innerHTML = `<p style="color:var(--text-secondary);font-size:14px;">Consultando clima...</p>`;
 
-    // API key pública de demostración (OpenWeatherMap — reemplaza con la tuya en Railway)
-    const API_KEY = "2e56f29db7c1ec396c1084de6db6e766";
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric&lang=es`;
+    const token = localStorage.getItem("token");
 
     try {
-        const res = await fetch(url);
+        const res = await fetch(`${API_BASE}/weather?city=${encodeURIComponent(city)}`, {
+            headers: { "authorization": token }
+        });
         const data = await res.json();
 
-        if (!res.ok || data.cod !== 200) {
-            resultEl.innerHTML = `<p style="color:var(--danger);font-size:14px;">⚠️ Ciudad no encontrada. Verifica el nombre e intenta de nuevo.</p>`;
+        if (!res.ok) {
+            resultEl.innerHTML = `<p style="color:var(--danger);font-size:14px;">⚠️ ${data.msg || "Ciudad no encontrada."}</p>`;
             return;
         }
 
@@ -788,7 +788,6 @@ async function fetchWeather() {
         const feelsLike = Math.round(data.main.feels_like);
         const windSpeed = data.wind.speed;
 
-        // Consejo de conservación basado en temp/humedad
         let tip = "";
         let tipColor = "var(--success)";
         if (temp > 30) {
@@ -819,7 +818,7 @@ async function fetchWeather() {
             <p style="font-size:11px;color:var(--text-secondary);margin-top:10px;">Fuente: OpenWeatherMap API · Datos en tiempo real</p>
         `;
     } catch (err) {
-        resultEl.innerHTML = `<p style="color:var(--danger);font-size:14px;">⚠️ Error de conexión con OpenWeather. Intenta de nuevo.</p>`;
+        resultEl.innerHTML = `<p style="color:var(--danger);font-size:14px;">⚠️ Error de conexión. Intenta de nuevo.</p>`;
     }
 }
 
