@@ -66,21 +66,22 @@ function onProductNameInput() {
 }
 
 function setupMobile() {
-    const hamburger = document.getElementById('hamburgerBtn');
-    if (!hamburger) return;
-    function checkWidth() {
-        if (window.innerWidth <= 768) {
-            hamburger.style.display = 'block';
-        } else {
-            hamburger.style.display = 'none';
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (sidebar) sidebar.classList.remove('open');
-            if (overlay) overlay.style.display = 'none';
-        }
-    }
     checkWidth();
     window.addEventListener('resize', checkWidth);
+}
+
+function checkWidth() {
+    const hamburger = document.getElementById('hamburgerBtn');
+    if (!hamburger) return;
+    if (window.innerWidth <= 768) {
+        hamburger.style.display = 'flex';
+    } else {
+        hamburger.style.display = 'none';
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.style.display = 'none';
+    }
 }
 
 function toggleSidebar() {
@@ -129,6 +130,7 @@ function showApp() {
     document.getElementById("appContainer").style.display = "flex";
     document.getElementById("userEmail").textContent = currentState.user.email;
     navigate('home');
+    checkWidth();
     if (window.gsap) {
         gsap.from(".sidebar", { duration: 0.7, x: -80, opacity: 0, ease: "power3.out" });
         gsap.from(".main-content", { duration: 0.7, y: 20, opacity: 0, delay: 0.2, ease: "power3.out" });
