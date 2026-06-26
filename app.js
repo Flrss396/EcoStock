@@ -768,7 +768,7 @@ async function fetchWeather() {
     resultEl.innerHTML = `<p style="color:var(--text-secondary);font-size:14px;">Consultando clima...</p>`;
 
     // API key pública de demostración (OpenWeatherMap — reemplaza con la tuya en Railway)
-    const API_KEY = "a8f4e2c4905a12c3f7b96d1ae4e0b3c2";
+    const API_KEY = "2e56f29db7c1ec396c1084de6db6e766";
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric&lang=es`;
 
     try {
