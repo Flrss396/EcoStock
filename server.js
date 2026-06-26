@@ -316,25 +316,6 @@ app.get("/stats", verifyToken, (req, res) => {
   });
 });
 
-/* ===== CLIMA (proxy seguro — la API key queda en el servidor) ===== */
-app.get("/weather", verifyToken, async (req, res) => {
-  const city = req.query.city;
-  if (!city) return res.status(400).json({ msg: "Ciudad requerida." });
-
-  const apiKey = process.env.OPENWEATHER_KEY;
-  if (!apiKey) return res.status(500).json({ msg: "OPENWEATHER_KEY no configurada en el servidor." });
-
-  try {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric&lang=es`;
-    const response = await fetch(url);
-    const data = await response.json();
-    if (!response.ok) return res.status(404).json({ msg: "Ciudad no encontrada." });
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ msg: "Error consultando OpenWeather." });
-  }
-});
-
 /* ===== SERVIDOR ===== */
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🌿 EcoStock corriendo en http://localhost:${PORT}`);
