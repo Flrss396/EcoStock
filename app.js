@@ -16,7 +16,54 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     initTheme();
     setupMobile();
+    setupMinDate();
 });
+
+// ===== FECHA MÍNIMA (+5 días desde hoy) =====
+function setupMinDate() {
+    const dateInput = document.getElementById("prodDate");
+    if (!dateInput) return;
+    const min = new Date();
+    min.setDate(min.getDate() + 5);
+    dateInput.min = min.toISOString().split("T")[0];
+}
+
+// ===== DETECCIÓN AUTOMÁTICA DE CATEGORÍA =====
+const CATEGORY_KEYWORDS = {
+    "Frutas y Verduras": ["manzana","pera","naranja","platano","plátano","banana","uva","fresa","mango","papaya","melon","melón","sandía","sandia","kiwi","durazno","ciruela","cereza","piña","pina","limon","limón","tomate","jitomate","zanahoria","lechuga","espinaca","brócoli","brocoli","coliflor","cebolla","ajo","pepino","calabaza","chayote","ejote","chile","pimiento","aguacate","verdura","fruta","vegetal"],
+    "Lácteos": ["leche","yogurt","yogur","queso","mantequilla","crema","jocoque","natilla","lácteo","lacteo","danonino","lala","alpura"],
+    "Carnes": ["pollo","res","cerdo","puerco","carne","bistec","milanesa","chuleta","tocino","salchicha","jamón","jamon","chorizo","pescado","atún","atun","camarón","camaron","mariscos","salmon","salmón","sardina","pavo","cordero"],
+    "Bebidas": ["jugo","refresco","té","te","cafe","café","cerveza","vino","bebida","licuado","smoothie","coca","pepsi","fanta","sprite"],
+    "Panadería": ["pan","tortilla","galleta","pastel","dona","donut","croissant","bagel","muffin","bizcocho","bolillo","telera","baguette","waffles","hotcakes"],
+    "Congelados": ["helado","nieve","paleta","congelado","frozen","nuggets"],
+    "Medicamentos": ["medicina","medicamento","pastilla","capsula","cápsula","jarabe","vitamina","ibuprofeno","paracetamol","aspirina","antibiótico","antibiotico","suplemento"],
+    "Limpieza": ["detergente","jabón","jabon","cloro","pinol","fabuloso","ajax","limpiador","desinfectante","shampoo","champú","acondicionador","suavizante","ariel","persil"]
+};
+
+function detectCategory(name) {
+    const lower = name.toLowerCase();
+    for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+        if (keywords.some(kw => lower.includes(kw))) {
+            return category;
+        }
+    }
+    return null;
+}
+
+function onProductNameInput() {
+    const name = document.getElementById("prodName").value.trim();
+    const select = document.getElementById("prodCategory");
+    if (!select) return;
+    const detected = detectCategory(name);
+    if (detected) {
+        select.value = detected;
+        select.style.borderColor = "var(--success)";
+        select.title = "Categoría detectada automáticamente";
+    } else {
+        select.style.borderColor = "";
+        select.title = "";
+    }
+}
 
 function setupMobile() {
     const hamburger = document.getElementById('hamburgerBtn');
@@ -112,6 +159,7 @@ function navigate(sectionId) {
             gsap.from(target.children, { duration: 0.5, y: 16, opacity: 0, stagger: 0.08, ease: "power2.out" });
         }
         if (['inventory', 'home', 'analytics'].includes(sectionId)) loadInventory();
+        if (sectionId === 'inventory') setupMinDate();
     }
 }
 
@@ -622,6 +670,28 @@ async function addProduct() {
     const token = localStorage.getItem("token");
 
     if (!name || !date) { showToast("Completa nombre y fecha", "warning"); return; }
+
+    // Validar fecha mínima (+5 días)
+    const minDate = new Date();
+    minDate.setDate(minDate.getDate() + 5);
+    minDate.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(date + "T00:00:00");
+    if (selectedDate < minDate) {
+        showToast("La fecha debe ser al menos 5 días a partir de hoy", "warning");
+        return;
+    }
+
+    // Si no se detectó categoría, pedir que elija
+    if (!category || category === "General") {
+        const detected = detectCategory(name);
+        if (!detected) {
+            showToast("Por favor selecciona una categoría manualmente", "warning");
+            document.getElementById("prodCategory").focus();
+            document.getElementById("prodCategory").style.borderColor = "var(--warning)";
+            setTimeout(() => document.getElementById("prodCategory").style.borderColor = "", 2000);
+            return;
+        }
+    }
 
     const status = computeStatus(date);
 

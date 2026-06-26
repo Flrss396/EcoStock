@@ -228,7 +228,7 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr 160px auto; gap: 16px; align-items: flex-end;">
                         <div class="form-group" style="margin-bottom: 0;">
                             <label>Nombre del Producto</label>
-                            <input type="text" id="prodName" placeholder="Ej. Manzanas Orgánicas" onkeydown="if(event.key==='Enter')addProduct()">
+                            <input type="text" id="prodName" placeholder="Ej. Manzanas Orgánicas" oninput="onProductNameInput()" onkeydown="if(event.key==='Enter')addProduct()">
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
                             <label>Fecha de Vencimiento</label>
