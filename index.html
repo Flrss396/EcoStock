@@ -202,6 +202,23 @@
                         Gestiona tu inventario con la elegancia y simplicidad que tu negocio merece. EcoStock te ayuda a prevenir el desperdicio y optimizar tus recursos.
                     </p>
                 </div>
+
+                <!-- CLIMA (API OpenWeather) -->
+                <div class="card" style="margin-top: 0;" id="weatherCard">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                        <span style="font-size:20px;">🌤️</span>
+                        <h2 style="margin:0;">Condiciones Ambientales</h2>
+                        <span style="margin-left:auto; font-size:11px; color:var(--text-secondary); background:rgba(0,113,227,0.08); padding:4px 10px; border-radius:20px; font-weight:600;">API OpenWeather</span>
+                    </div>
+                    <p style="color:var(--text-secondary); font-size:13px; margin-bottom:18px;">
+                        La temperatura y humedad afectan la conservación de tus productos. Monitorea las condiciones actuales de tu ciudad.
+                    </p>
+                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                        <input type="text" id="weatherCity" placeholder="Ej. Monterrey" style="max-width:200px; padding:10px 14px; font-size:14px;" onkeydown="if(event.key==='Enter')fetchWeather()">
+                        <button onclick="fetchWeather()" class="primary" style="padding:10px 18px; font-size:14px;">Consultar clima</button>
+                    </div>
+                    <div id="weatherResult" style="margin-top:18px;"></div>
+                </div>
             </section>
 
             <!-- INVENTORY -->
